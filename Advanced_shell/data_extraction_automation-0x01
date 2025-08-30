@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Define the input file
+INPUT_FILE="data.json"
+
+# Check if the input file exists
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Error: $INPUT_FILE not found. Please run Task 0 first."
+    exit 1
+fi
+
+# Use jq to extract the name, height, weight, and first type
+# Use a single jq command to get all values and print them space-separated
+DATA=$(jq -r '.name, .types[0].type.name, (.height / 10 | tostring), (.weight / 10 | tostring)' "$INPUT_FILE")
+
+# Read the extracted data into variables
+read -r name type height weight <<< "$DATA"
+
+# Format the output in the desired human-readable way
+printf "%s is of type %s, weighs %skg, and is %sm tall.\n" "$(tr '[:lower:]' '[:upper:]' <<< ${name:0:1})${name:1}" "$(tr '[:lower:]' '[:upper:]' <<< ${type:0:1})${type:1}" "$weight" "$height"
