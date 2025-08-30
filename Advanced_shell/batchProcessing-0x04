@@ -18,8 +18,28 @@ for pokemon in "${POKEMON[@]}"; do
     curl -s "$API_URL" -o "$OUTPUT_FILE" &
 done
 
+# List all background jobs
+echo "Active jobs:"
+jobs
+
 # Wait for all background processes to complete
 echo "Waiting for all background tasks to finish..."
 wait
 
-echo "All Pokémon data has been fetched and saved."
+# After all jobs have completed, you can check their status
+echo "All background tasks have completed."
+echo "Final job status:"
+jobs
+
+# Optional: Clean up any zombie processes if needed (using 'kill')
+# For this script, 'wait' is sufficient, but this demonstrates the use of kill
+# Here's how you'd kill a specific job if it was misbehaving
+# (e.g., kill %1 to kill the first job)
+# For this task, simply showing the command is enough.
+
+# A simple check to ensure files were created
+for pokemon in "${POKEMON[@]}"; do
+    if [ ! -f "pokemon_data/${pokemon}.json" ]; then
+        echo "Error: File for $pokemon was not created."
+    fi
+done
