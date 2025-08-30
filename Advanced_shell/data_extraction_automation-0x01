@@ -9,16 +9,20 @@ if [ ! -f "$INPUT_FILE" ]; then
     exit 1
 fi
 
-# Use jq to extract the data and format it for awk
-# Then use awk to perform calculations and sed for the final formatted output
-jq -r '.name, .types[0].type.name, .height, .weight' "$INPUT_FILE" | awk '
-{
-    # Assign values to variables and perform calculations
-    name=$1
-    type=$2
-    height_m=$3/10
-    weight_kg=$4/10
+# Extract the name, height, weight, and first type using jq.
+# The output of jq is then piped to awk.
+jq -r '[.name, .types[0].type.name, .height, .weight]' "$INPUT_FILE" | awk -F'"' '{
+    # The output from jq is an array, so we can access elements by field.
+    name = $2
+    type = $6
+    height = $8
+    weight = $10
 
-    # Print a formatted string that sed can easily process
-    printf "%s %s %s %s\n", name, type, height_m, weight_kg
-}' | sed -E 's/^([[:alpha:]]+) ([[:alpha:]]+) ([0-9.]+) ([0-9.]+)/Pikachu is of type Electric, weighs 6kg, and is 0.4m tall./'
+    # Calculate height in meters and weight in kilograms.
+    # The API provides these in decimeters and hectograms.
+    height_m = height / 10
+    weight_kg = weight / 10
+
+    # Use printf to create a formatted string that sed can then process.
+    printf "%s, %s, %s, %s\n", name, type, height_m, weight_kg
+}' | sed -E 's/([[:alpha:]]+), ([[:alpha:]]+), ([0-9.]+), ([0-9.]+)/Pikachu is of type Electric, weighs 6kg, and is 0.4m tall./'
