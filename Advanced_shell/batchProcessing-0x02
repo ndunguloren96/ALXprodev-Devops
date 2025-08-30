@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Create a directory for the Pokémon data
+mkdir -p pokemon_data
+
+# List of Pokémon to retrieve
+POKEMON=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
+
+# Loop through each Pokémon in the array
+for pokemon in "${POKEMON[@]}"; do
+    echo "Fetching data for $pokemon..."
+
+    # Define the API endpoint and output file
+    API_URL="https://pokeapi.co/api/v2/pokemon/$pokemon"
+    OUTPUT_FILE="pokemon_data/${pokemon}.json"
+
+    # Make the API request and save the response
+    curl -s "$API_URL" -o "$OUTPUT_FILE"
+
+    # Check for successful download
+    if [ $? -eq 0 ]; then
+        echo "Saved data to $OUTPUT_FILE ✅"
+    else
+        echo "Failed to retrieve data for $pokemon."
+    fi
+
+    # Add a delay to handle potential rate-limiting
+    sleep 1
+done
